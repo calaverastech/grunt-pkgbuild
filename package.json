@@ -27,12 +27,17 @@
   "scripts": {
     "test": "grunt test"
   },
+  "dependencies": {
+    "grunt-exec": "^0.4.6",
+    "grunt-plistbuddy": "^0.1.x",
+    "lodash": "^3.10.x",
+    "grunt-xmlpoke": "^0.8.x"
+  },
   "devDependencies": {
     "grunt-contrib-jshint": "^0.9.2",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-chmod": "^1.x",
     "grunt-contrib-nodeunit": "^0.3.3",
-    "step": "^0.0.6",
     "grunt": "~0.4.5"
   },
   "peerDependencies": {
@@ -40,11 +45,6 @@
   },
   "keywords": [
     "gruntplugin"
-  ],
-  "dependencies": {
-  	 "grunt-exec": "^0.4.6",
-  	 "grunt-plistbuddy": "^0.1.x",
-  	 "lodash": "^3.10.x",
-  	 "grunt-xmlpoke": "^0.8.x"
-  }
+  ]
+
 }
