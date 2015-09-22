@@ -1,6 +1,6 @@
 /*
- * grunt-macpackage
- * https://github.com/tmoskun/grunt-macpackage
+ * grunt-pkgbuild
+ * https://github.com/calaverastech/grunt-pkgbuild
  *
  * Copyright (c) 2015 tmoskun
  * Licensed under the MIT license.
