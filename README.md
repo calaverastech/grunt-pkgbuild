@@ -134,6 +134,14 @@ pkgbuild: {
 	}
 }
 
+##Testing
+
+To run the grunt test suite type:
+
+> grunt --passw=<your root password>
+
+Password is required to install and uninstall test packages
+
 ##Troubleshooting
 
 By default, if a file or directory is not found it is ignored with a grunt log warning.
