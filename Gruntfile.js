@@ -103,7 +103,6 @@ module.exports = function(grunt) {
         },
 		installPkg: {
 			cmd: function(cwd, pkg, passw) {
-                   console.log("echo " + passw + " | sudo -S installer -pkg " + cwd + "/" + pkg + " -target /");
                    return "echo " + passw + " | sudo -S installer -pkg " + cwd + "/" + pkg + " -target /";
 			},
 			stdout: true
