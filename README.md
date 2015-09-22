@@ -138,7 +138,7 @@ pkgbuild: {
 
 To run the grunt test suite type:
 
-> grunt --passw=<your root password>
+> grunt --passw=&lt; your root password &gt;
 
 Password is required to install and uninstall test packages
 
