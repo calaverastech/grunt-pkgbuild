@@ -1,0 +1,50 @@
+{
+  "name": "grunt-pkgbuild",
+  "description": "Create Mac packages",
+  "version": "0.1.0",
+  "homepage": "https://github.com/calaverastech/grunt-pkgbuild",
+  "author": {
+    "name": "tmoskun",
+    "email": "admin@calaverastech.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/calaverastech/grunt-pkgbuild.git"
+  },
+  "bugs": {
+    "url": "https://github.com/calaverastech/grunt-pkgbuild/issues"
+  },
+  "license": "MIT",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/calaverastech/grunt-pkgbuild/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-chmod": "^1.x",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "step": "^0.0.6",
+    "grunt": "~0.4.5"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "gruntplugin"
+  ],
+  "dependencies": {
+  	 "grunt-exec": "^0.4.6",
+  	 "grunt-plistbuddy": "^0.1.x",
+  	 "lodash": "^3.10.x",
+  	 "grunt-xmlpoke": "^0.8.x"
+  }
+}

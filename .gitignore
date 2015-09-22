@@ -1,0 +1,9 @@
+node_modules
+npm-debug.log
+tmp
+packages
+comp
+root
+/.settings
+/.buildpath
+/.project
