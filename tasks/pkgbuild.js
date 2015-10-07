@@ -136,9 +136,6 @@ module.exports = function(grunt) {
     if(!grunt.file.isPathAbsolute(options.dest)) {
         options.dest = process.cwd() + "/" + options.dest;
     }
-                          
-    
-    //grunt.config("exec.cwd", this.data.options.cwd);
     
     if(!!options.dest) {
         grunt.task.run("exec:mkdir:"+options.dest);

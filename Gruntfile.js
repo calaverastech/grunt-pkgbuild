@@ -34,8 +34,8 @@ module.exports = function(grunt) {
 
     // Before generating any new files, remove any previously-created files.
     clean: {
-      tests: ['test/packages/*'],
-      apps: ["test/fixtures/comp/**/*", "test/fixtures/root/**/*"]
+      tests: [process.cwd() + '/test/packages/*'],
+      apps: [process.cwd() + "/test/fixtures/comp/**/*", process.cwd() + "/test/fixtures/root/**/*"]
     },
     receipts: {
         root: "<%= identifier_prefix %>.root.app.pkg",
@@ -119,7 +119,7 @@ module.exports = function(grunt) {
 		
     },
     chmod: {
-    	src: "scripts/**/*",
+    	src: "test/fixtures/scripts/**/*",
         options: {
             mode: "755"
         }
