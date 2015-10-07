@@ -117,19 +117,39 @@ module.exports = function(grunt) {
     //  component: false
     //	plist: "Info.plist"
     //});
-
-	grunt.config("exec.cwd", this.options.cwd);
-    
-    if(!!this.data.options.dest) {
-        grunt.task.run("exec:mkdir:"+this.data.options.dest);
+                          
+    var data = this.data,
+        options = this.data.options !== undefined ? data.options : {},
+        files = this.data.files;
+                        
+    if(!!data.cwd) {
+        options.cwd = data.cwd;
     }
-	var dest = (this.data.options.dest || ".") + "/";
-    var cwd = (this.data.options.cwd || ".") + "/";
+    if(data.dest) {
+        options.dest = data.dest;
+    }
+                          
+    if(!grunt.file.isPathAbsolute(options.cwd)) {
+        options.cwd = process.cwd() + "/" + options.cwd;
+    }
+                          
+    if(!grunt.file.isPathAbsolute(options.dest)) {
+        options.dest = process.cwd() + "/" + options.dest;
+    }
+                          
+    
+    //grunt.config("exec.cwd", this.data.options.cwd);
+    
+    if(!!options.dest) {
+        grunt.task.run("exec:mkdir:"+options.dest);
+    }
+	var dest = (options.dest || ".") + "/";
+    var cwd = (options.cwd || ".") + "/";
                           
     var keys=_.keys(grunt.config("plistbuddy"));
                           
     // Iterate over all specified file groups.
-	_.chain(this.data.files)
+	_.chain(files)
         .filter(function(f, index) {
 		  var file = f.root || f.component || f.scripts;
 		  if(!file || file.length === 0) {
@@ -151,7 +171,8 @@ module.exports = function(grunt) {
 		var plist, opts;
 		if(!!f.analyze) {
 		  plist = dest + (f.plist || (f.root + ".plist"));
-               grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
+          grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
+          grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
 		  if(!!f.plistoptions) {
 			  opts = _.intersection(_.keys(f.plistoptions), keys);
               _.each(opts, function(o) {
@@ -168,14 +189,16 @@ module.exports = function(grunt) {
 		  } 
 		  var pkgname = dest+f.pkgname;
 		  if(!!f.component && f.component.length > 0){
-			  grunt.task.run("exec:createMacPkgFromComponent:"+f.component+":"+pkgname+":"+f.location+":"+f.identifier);
+              grunt.config("exec.createMacPkgFromComponent.cwd", options.cwd);
+              grunt.task.run("exec:createMacPkgFromComponent:"+f.component+":"+pkgname+":"+f.location+":"+f.identifier);
 		  } else if(!!f.root && f.root.length > 0) {
 			  plist = f.plist || (dest + f.root + ".plist");
 			  if(!!f.plistoptions) {
 				  opts = _.intersection(f.plistoptions, keys);
 				  if(opts.length > 0) {
 					  if(!f.plist) {
-						  grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
+                          grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
+                          grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
 					  }
                       _.each(opts, function(o) {
                              grunt.config("plistbuddy."+o+".value", f.plistoptions[o]);
@@ -183,9 +206,11 @@ module.exports = function(grunt) {
                       });
                   }
 			  }
-			  grunt.task.run("exec:createMacPkgFromRoot:"+f.root+":"+pkgname+":"+f.version+":"+f.location+":"+f.identifier+":"+f.scripts+":"+plist);
+            grunt.config("exec.createMacPkgFromRoot.cwd", options.cwd);
+            grunt.task.run("exec:createMacPkgFromRoot:"+f.root+":"+pkgname+":"+f.version+":"+f.location+":"+f.identifier+":"+f.scripts+":"+plist);
 		  } else if(!!f.scripts && f.scripts.length > 0) {
-               grunt.task.run("exec:createScriptPkg:"+f.scripts+":"+pkgname+":"+f.identifier);
+              grunt.config("exec.createScriptPkg.cwd", options.cwd);
+              grunt.task.run("exec:createScriptPkg:"+f.scripts+":"+pkgname+":"+f.identifier);
 		  } else {
 			  grunt.log.warn("Missing paramateres. Can't create package from " + file);
 		  }

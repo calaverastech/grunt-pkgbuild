@@ -34,8 +34,8 @@ module.exports = function(grunt) {
 
     // Before generating any new files, remove any previously-created files.
     clean: {
-      tests: ['packages/*'],
-      apps: ["comp/**/*", "root/**/*"]
+      tests: ['test/packages/*'],
+      apps: ["test/fixtures/comp/**/*", "test/fixtures/root/**/*"]
     },
     receipts: {
         root: "<%= identifier_prefix %>.root.app.pkg",
@@ -47,14 +47,15 @@ module.exports = function(grunt) {
     pkgbuild: {
         my_build: {
             options: {
-                    dest: "packages"
+                    cwd: "test",
+                    dest: "test/packages"
             },
             files: [
-                    {root: "root", analyze: true, plist: "Info.plist", plistoptions: {"BundleIsRelocatable": false}},
-                    {root: "root", plist: "packages/Info.plist", location: "/tmp", version: "1.0", identifier: "<%= receipts.root %>", pkgname: "<%= name_prefix %>-fromRoot-<%= date %>"},
-                    {component: ["comp/<%= name_prefix %>Comp.app"], location: "/tmp", pkgname: "<%= name_prefix %>-fromComp-<%= date %>"},
-                    {scripts: "scripts/preflight", pkgname: "<%= name_prefix %>-preflight-<%= date %>", identifier: "<%= receipts.preflight %>"},
-                    {scripts: "scripts/postflight", pkgname: "<%= name_prefix %>-postflight-<%= date %>", identifier: "<%= receipts.postflight %>"},
+                    {root: "fixtures/root", analyze: true, plist: "Info.plist", plistoptions: {"BundleIsRelocatable": false}},
+                    {root: "fixtures/root", plist: "packages/Info.plist", location: "/tmp", version: "1.0", identifier: "<%= receipts.root %>", pkgname: "<%= name_prefix %>-fromRoot-<%= date %>"},
+                    {component: ["fixtures/comp/<%= name_prefix %>Comp.app"], location: "/tmp", pkgname: "<%= name_prefix %>-fromComp-<%= date %>"},
+                    {scripts: "fixtures/scripts/preflight", pkgname: "<%= name_prefix %>-preflight-<%= date %>", identifier: "<%= receipts.preflight %>"},
+                    {scripts: "fixtures/scripts/postflight", pkgname: "<%= name_prefix %>-postflight-<%= date %>", identifier: "<%= receipts.postflight %>"},
             ]
       }
       //default_options: {
@@ -82,8 +83,8 @@ module.exports = function(grunt) {
     },
     exec: {
 		createMacApp: {
-			cmd: function(dir, identifier, script, appname) {
-    			return 'mkdir -p ' + dir + ' && /usr/local/bin/platypus -A -y -o "None" -V 1.0 -u "CalaverasTech.com" -I ' + identifier + ' ' + script + ' ' + dir + '/' + appname + '.app';
+			cmd: function(cwd, dir, identifier, script, appname) {
+    			return 'cd ' + cwd + ' && mkdir -p ' + dir + ' && /usr/local/bin/platypus -A -y -o "None" -V 1.0 -u "CalaverasTech.com" -I ' + identifier + ' ' + script + ' ' + dir + '/' + appname + '.app';
     		},
 	        //return 'mkdir -p app && /usr/local/bin/platypus -A -y -o "None" -i ' + cwd + '/icons/snmpsniffer.icns -V ' + version + ' -u "CalaverasTech.com" -I com.calaverastech.Snmpsniffer -f ' + cwd + '/bin/mac/snmpsniffer-run.sh ' + comm + " " + app;
 	        //return 'mkdir -p app && /usr/local/bin/platypus -A -y -o "None" -i ' + cwd + '/icons/snmpsniffer.icns -V ' + version + ' -u "CalaverasTech.com" -I com.calaverastech.Snmpsniffer ' + comm + " " + app;
@@ -147,7 +148,7 @@ module.exports = function(grunt) {
       });
   });
   
-  grunt.registerTask("createFiles", "Create bundles and files for testing", ["chmod", "exec:createMacApp:root:" + grunt.config("identifier_prefix")+ ".app.pkg" + ":scripts/my_script1:" + grunt.config("name_prefix")+"Root", "exec:createMacApp:comp:" + grunt.config("receipts.component") + ":scripts/my_script2:" + grunt.config("name_prefix") + "Comp"]);
+  grunt.registerTask("createFiles", "Create bundles and files for testing", ["chmod", "exec:createMacApp:test/fixtures:root:" + grunt.config("identifier_prefix")+ ".app.pkg" + ":scripts/my_script1:" + grunt.config("name_prefix")+"Root", "exec:createMacApp:test/fixtures:comp:" + grunt.config("receipts.component") + ":scripts/my_script2:" + grunt.config("name_prefix") + "Comp"]);
     
   grunt.registerTask("installPackages", "Install all created packages", function(passw) {
 	  var dest = grunt.config("pkgbuild.my_build.options.dest") || ".";
