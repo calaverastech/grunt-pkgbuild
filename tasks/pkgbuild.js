@@ -24,7 +24,9 @@ function PkgbuildObj(obj) {
 
 module.exports = function(grunt) {
   //var tmp = require("tmp");
-  var _ = require('lodash');
+  var _ = require('lodash'),
+    path = require("path"),
+    fs = require("fs");
     
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
@@ -102,7 +104,17 @@ module.exports = function(grunt) {
         }
   });
     
+  var apppath = process.cwd(),
+  currpath = process.cwd();
+    
+  process.chdir(__dirname);
+  while(currpath !== "/" && !fs.existsSync("node_modules")) {
+    currpath = path.join(process.cwd(), "../");
+    process.chdir(currpath);
+  }
   grunt.loadNpmTasks('grunt-plistbuddy');
+    
+  process.chdir(apppath);
     
   grunt.registerMultiTask('pkgbuild', 'Create Mac packages', function() {
 	//Check platform
