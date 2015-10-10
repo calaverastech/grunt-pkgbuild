@@ -1,7 +1,7 @@
 {
   "name": "grunt-pkgbuild",
   "description": "Create Mac packages",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/calaverastech/grunt-pkgbuild",
   "author": {
     "name": "tmoskun",
@@ -47,5 +47,4 @@
   "keywords": [
     "gruntplugin"
   ]
-
 }
