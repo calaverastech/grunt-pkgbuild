@@ -24,10 +24,7 @@ In your project's Gruntfile, add a section named `pkgbuild` to the data object p
 
 ```js
 grunt.initConfig({
-  macpackage: {
-    options: {
-      // Task-specific options go here.
-    },
+  pkgbuild: {
     your_target: {
       // Target-specific file lists and/or options go here.
     },
