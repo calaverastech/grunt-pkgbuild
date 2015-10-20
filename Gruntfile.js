@@ -12,10 +12,6 @@ var _ = require('lodash');
 
 module.exports = function(grunt) {
 		
-  //var date = grunt.template.today('mmmm-dd-yyyy-h-MM-TT');
-  //var identifier_prefix = "com.Calaverastech."+date+".";
-  //var identifier_prefix = "com.calaverastech.Test.";
-	
   // Project configuration.
   grunt.initConfig({
     date: grunt.template.today('mmmm-dd-yyyy-h-MM-TT'),
@@ -58,23 +54,6 @@ module.exports = function(grunt) {
                     {scripts: "fixtures/scripts/postflight", pkgname: "<%= name_prefix %>-postflight-<%= date %>", identifier: "<%= receipts.postflight %>"},
             ]
       }
-      //default_options: {
-      //  options: {
-      //  },
-      //  files: {
-      //    
-      //    'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
-      //  }
-      //},
-      //custom_options: {
-        //options: {
-          //separator: ': ',
-          //punctuation: ' !!!'
-        //},
-        //files: {
-          //'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
-        //}
-      //}
     },
 
     // Unit tests.
@@ -86,8 +65,6 @@ module.exports = function(grunt) {
 			cmd: function(cwd, dir, identifier, script, appname) {
     			return 'cd ' + cwd + ' && mkdir -p ' + dir + ' && /usr/local/bin/platypus -A -y -o "None" -V 1.0 -u "CalaverasTech.com" -I ' + identifier + ' ' + script + ' ' + dir + '/' + appname + '.app';
     		},
-	        //return 'mkdir -p app && /usr/local/bin/platypus -A -y -o "None" -i ' + cwd + '/icons/snmpsniffer.icns -V ' + version + ' -u "CalaverasTech.com" -I com.calaverastech.Snmpsniffer -f ' + cwd + '/bin/mac/snmpsniffer-run.sh ' + comm + " " + app;
-	        //return 'mkdir -p app && /usr/local/bin/platypus -A -y -o "None" -i ' + cwd + '/icons/snmpsniffer.icns -V ' + version + ' -u "CalaverasTech.com" -I com.calaverastech.Snmpsniffer ' + comm + " " + app;
 			stdout: true
 		},
         removeScriptResults: {
@@ -179,8 +156,7 @@ module.exports = function(grunt) {
       grunt.task.run("nodeunit");
   });
   
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
+  //clean old files, create applications for tesing, create packages with productbuild, install them, test the installation, uninstall them, test the uninstallation
   grunt.registerTask('test', ['cleanFiles:'+grunt.option("passw"), 'createFiles', 'pkgbuild', 'clean:apps', 'installPackages:'+grunt.option("passw"), 'pkgbuildTest:installed', 'uninstallPackages:'+grunt.option("passw"), 'pkgbuildTest:uninstalled']);
 	  
   // By default, lint and run all tests.

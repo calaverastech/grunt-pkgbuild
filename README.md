@@ -42,7 +42,7 @@ All src matches are relative to (but don't include) this path.
 #### options.dest
 Type: `String`
 
-Packages are placed into this directory
+Created packages are placed into this directory
 
 ### File Options
 
