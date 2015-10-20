@@ -22,12 +22,27 @@ function PkgbuildObj(obj) {
     this.pkgname = obj.pkgname || "";
 }
 
+
+
 module.exports = function(grunt) {
   //var tmp = require("tmp");
   var _ = require('lodash'),
     path = require("path"),
-    fs = require("fs");
+    fs = require("fs"),
+    done;
     
+  //var pkgcount = 0,
+  //    pkgnumber,
+  //    callback;
+    
+  //  function processResult(error, stdout, stderr) {
+  //      if(!!error) {
+  //          grunt.log.error("ERROR: " + error);
+  //      }
+  //  }
+    
+  
+
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
   
@@ -42,7 +57,7 @@ module.exports = function(grunt) {
                      cmd: function(scripts, pkgname, identifier) {
                         return "pkgbuild --identifier " + ((!!identifier && identifier.length > 0) ? identifier : ("com." + pkgname + ".pkg")) + " --nopayload --scripts " + scripts + " " + pkgname + ".pkg";
                      },
-                     stdout: true
+                     stdout: true,
             },
             analyzeMacPkg: {
                      cmd: function (root, plist, scripts) {
@@ -64,8 +79,9 @@ module.exports = function(grunt) {
                             }
                             return comm + " --component " + comp + ((!!currentLoc && currentLoc.length > 0) ? (" --install-location " + currentLoc):"");
                         }, "");
-                     return "pkgbuild " + comp_str + ((!!identifier && identifier.length > 0) ? (" --identifier " + identifier) : "") + ((!!scripts && scripts.length > 0) ? (" --scripts " + scripts):"") +  " " + pkgname + ".pkg";
-                }
+                        return "pkgbuild " + comp_str + ((!!identifier && identifier.length > 0) ? (" --identifier " + identifier) : "") + ((!!scripts && scripts.length > 0) ? (" --scripts " + scripts):"") +  " " + pkgname + ".pkg";
+                     },
+                     stdout: true
             },
             createMacPkgFromRoot: {
                      cmd: function(root, pkgname, version, loc, identifier, scripts, plist) {
@@ -77,7 +93,7 @@ module.exports = function(grunt) {
                         ((!!scripts && scripts.length > 0) ? (" --scripts " + scripts) : "") +
                         " " + pkgname + ".pkg";
                      },
-                     stdout: true
+                     stdout: true,
             }
         },
         plistbuddy: {
@@ -103,6 +119,7 @@ module.exports = function(grunt) {
             }
         }
   });
+    
     
   var apppath = process.cwd(),
   currpath = process.cwd();
@@ -132,8 +149,9 @@ module.exports = function(grunt) {
                           
     var data = this.data,
         options = this.data.options !== undefined ? data.options : {},
-        files = this.data.files;
-                        
+        files = this.data.files,
+        target = this.target;
+                          
     if(!!data.cwd) {
         options.cwd = data.cwd;
     }
@@ -157,6 +175,16 @@ module.exports = function(grunt) {
                           
     var keys=_.keys(grunt.config("plistbuddy"));
                           
+    //create a callback after all packages are created
+    var func = data.callback;
+    if(!func || typeof func !== "function") {
+        func = function() {
+            grunt.log.ok("CREATING PACKAGES FOR " + target + " IS FINISHED");
+        };
+    }
+                          
+    done = _.after(files.length, func);
+                          
     // Iterate over all specified file groups.
 	_.chain(files)
         .filter(function(f, index) {
@@ -175,11 +203,11 @@ module.exports = function(grunt) {
       })
       .map(function(f) {
          return new PkgbuildObj(f);
-      })
-      .each(function(f) {
+      }).each(function(f) {
 		var plist, opts;
 		if(!!f.analyze) {
 		  plist = dest + (f.plist || (f.root + ".plist"));
+          grunt.config("exec.analyzeMacPkg.callback", done);
           grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
           grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
 		  if(!!f.plistoptions) {
@@ -199,6 +227,7 @@ module.exports = function(grunt) {
 		  var pkgname = dest+f.pkgname;
 		  if(!!f.component && f.component.length > 0){
               grunt.config("exec.createMacPkgFromComponent.cwd", options.cwd);
+              grunt.config("exec.createMacPkgFromComponent.callback", done);
               grunt.task.run("exec:createMacPkgFromComponent:"+f.component+":"+pkgname+":"+f.location+":"+f.identifier);
 		  } else if(!!f.root && f.root.length > 0) {
 			  plist = f.plist || (dest + f.root + ".plist");
@@ -215,9 +244,11 @@ module.exports = function(grunt) {
                       });
                   }
 			  }
+            grunt.config("exec.createMacPkgFromRoot.callback", done);
             grunt.config("exec.createMacPkgFromRoot.cwd", options.cwd);
             grunt.task.run("exec:createMacPkgFromRoot:"+f.root+":"+pkgname+":"+f.version+":"+f.location+":"+f.identifier+":"+f.scripts+":"+plist);
 		  } else if(!!f.scripts && f.scripts.length > 0) {
+              grunt.config("exec.createScriptPkg.callback", done);
               grunt.config("exec.createScriptPkg.cwd", options.cwd);
               grunt.task.run("exec:createScriptPkg:"+f.scripts+":"+pkgname+":"+f.identifier);
 		  } else {

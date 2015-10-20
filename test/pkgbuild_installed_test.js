@@ -102,7 +102,7 @@ module.exports = {
         var res3 = new Buffer("");
         var line = "This is " + f;
         try {
-            res3 = child_process.execSync('grep "' + line + '" ' + log);
+            res3 = child_process.execSync('grep -m 1 "' + line + '" ' + log);
         } catch(err) {
             //console.log(err.message);
         }
