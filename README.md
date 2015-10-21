@@ -97,6 +97,8 @@ Type: `String`
 Directory name with package scripts
 
 ### Usage Examples
+
+```js
 pkgbuild: {
 	my_target: {
 		options: {
@@ -130,6 +132,7 @@ pkgbuild: {
 		]
 	}
 }
+```
 
 ##Testing
 
@@ -148,3 +151,4 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 2015-09-21 Initial release
+2015-10-20 Release 0.2
