@@ -121,17 +121,29 @@ module.exports = function(grunt) {
   });
     
     
-  var apppath = process.cwd(),
-  currpath = process.cwd();
+    var libs = ['grunt-plistbuddy'];
     
-  process.chdir(__dirname);
-  while(currpath !== "/" && !fs.existsSync("node_modules")) {
-    currpath = path.join(process.cwd(), "../");
-    process.chdir(currpath);
-  }
-  grunt.loadNpmTasks('grunt-plistbuddy');
+    var apppath = process.cwd(),
+    dirfiles = [],
+    libfiles = [];
     
-  process.chdir(apppath);
+    process.chdir(__dirname);
+    var currpath = process.cwd();
+    
+    while(currpath !== "/" && libs.length > 0) {
+        if(fs.existsSync("node_modules")) {
+            dirfiles = grunt.file.expand({cwd: path.join(currpath,"node_modules"), filter:"isDirectory"}, "*" );
+            libfiles = _.intersection(dirfiles, libs);
+            for(var i = 0; i<libfiles.length; i++) {
+                grunt.loadNpmTasks(libfiles[i]);
+            }
+            libs = _.difference(libs, libfiles);
+        }
+        currpath = path.join(process.cwd(), "../");
+        process.chdir(currpath);
+    }
+    
+    process.chdir(apppath);
     
   grunt.registerMultiTask('pkgbuild', 'Create Mac packages', function() {
 	//Check platform
@@ -148,7 +160,7 @@ module.exports = function(grunt) {
     //});
                           
     var data = this.data,
-        options = this.data.options !== undefined ? data.options : {},
+        options = this.options({cwd: process.cwd(), dest: process.cwd()}),
         files = this.data.files,
         target = this.target;
                           
