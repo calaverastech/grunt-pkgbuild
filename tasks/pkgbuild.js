@@ -221,12 +221,14 @@ module.exports = function(grunt) {
 		  plist = dest + (f.plist || (f.root + ".plist"));
           grunt.config("exec.analyzeMacPkg.callback", done);
           grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
+              
           grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
+              
 		  if(!!f.plistoptions) {
-			  opts = _.intersection(_.keys(f.plistoptions), keys);
-              _.each(opts, function(o) {
+              opts = _.pick(f.plistoptions, keys);
+              _.each(opts, function(val, o) {
                     grunt.config("plistbuddy."+o+".src", plist);
-                    grunt.config("plistbuddy."+o+".value", f.plistoptions[o]);
+                    grunt.config("plistbuddy."+o+".value", val);
                     grunt.task.run("plistbuddy:"+o);
               });
 		  }
@@ -242,16 +244,17 @@ module.exports = function(grunt) {
               grunt.config("exec.createMacPkgFromComponent.callback", done);
               grunt.task.run("exec:createMacPkgFromComponent:"+f.component+":"+pkgname+":"+f.location+":"+f.identifier);
 		  } else if(!!f.root && f.root.length > 0) {
-			  plist = f.plist || (dest + f.root + ".plist");
+			  plist = f.plist;
 			  if(!!f.plistoptions) {
-				  opts = _.intersection(f.plistoptions, keys);
+				  opts = _.pick(f.plistoptions, keys);
 				  if(opts.length > 0) {
 					  if(!f.plist) {
+                          plist = dest + f.root + ".plist";
                           grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
                           grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
 					  }
-                      _.each(opts, function(o) {
-                             grunt.config("plistbuddy."+o+".value", f.plistoptions[o]);
+                      _.each(opts, function(val, o) {
+                             grunt.config("plistbuddy."+o+".value", val);
                              grunt.task.run("plistbuddy:"+o);
                       });
                   }
