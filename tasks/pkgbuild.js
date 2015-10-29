@@ -159,6 +159,31 @@ module.exports = function(grunt) {
     //	plist: "Info.plist"
     //});
                           
+    //get absolute path
+    function abs_path(file, cwd) {
+                          
+        function get_path(p) {
+            var dir = grunt.file.isPathAbsolute(p) ? "" : (cwd || ".");
+            return path.join(dir, p);
+        }
+                          
+        if(_.isArray(file)) {
+            return _.map(file, function(p) {
+                return get_path(p);
+            });
+        } else {
+            return get_path(file);
+        }
+    }
+                          
+    function file_exists(file) {
+        if (!grunt.file.exists(file)) {
+            grunt.log.warn('Source file "' + file + '" not found.');
+            return false;
+        }
+        return true;
+    }
+                          
     var data = this.data,
         options = this.options({cwd: process.cwd(), dest: process.cwd()}),
         files = this.data.files,
@@ -172,19 +197,17 @@ module.exports = function(grunt) {
     }
                           
     if(!grunt.file.isPathAbsolute(options.cwd)) {
-        options.cwd = process.cwd() + "/" + options.cwd;
+        options.cwd = path.join(process.cwd(), options.cwd);
     }
                           
     if(!grunt.file.isPathAbsolute(options.dest)) {
-        options.dest = process.cwd() + "/" + options.dest;
+        options.dest = path.join(process.cwd(), options.dest);
     }
     
     if(!!options.dest) {
         grunt.task.run("exec:mkdir:"+options.dest);
     }
-	var dest = (options.dest || ".") + "/";
-    var cwd = (options.cwd || ".") + "/";
-                          
+    
     var keys=_.keys(grunt.config("plistbuddy"));
                           
     //create a callback after all packages are created
@@ -197,6 +220,7 @@ module.exports = function(grunt) {
                           
     done = _.after(files.length, func);
                           
+                          
     // Iterate over all specified file groups.
 	_.chain(files)
         .filter(function(f, index) {
@@ -205,61 +229,67 @@ module.exports = function(grunt) {
 			  grunt.log.warn("Neither root nor component, nor scripts are specified for the file " + index);
 			  return false;
 		  }
-          file = cwd + file;
-          if (!grunt.file.exists(file)) {
-            grunt.log.warn('Source file "' + file + '" not found.');
-            return false;
-		  } else {
-            return true;
+          file = abs_path(file, options.cwd);
+          if(_.isArray(file)) {
+                return _.every(file, function(f) {
+                    return file_exists(f);
+                });
+          } else {
+             return file_exists(file);
           }
+          return true;
       })
       .map(function(f) {
          return new PkgbuildObj(f);
       }).each(function(f) {
-		var plist, opts;
+		var plist = abs_path((f.plist || (path.basename(f.root) + ".plist")), options.dest),
+            opts = _.pick(f.plistoptions, keys);
+        var callback;
+        
+        var set_plist = function(plist, callback) {
+            _.each(opts, function(val, o) {
+                grunt.config("plistbuddy."+o+".src", plist);
+                grunt.config("plistbuddy."+o+".value", val);
+                grunt.task.run("plistbuddy:"+o);
+            });
+            if(!!callback) {
+              callback.call();
+            }
+        };
+              
 		if(!!f.analyze) {
-		  plist = dest + (f.plist || (f.root + ".plist"));
-          grunt.config("exec.analyzeMacPkg.callback", done);
+          grunt.config("exec.analyzeMacPkg.callback", function() {
+             set_plist(plist, done);
+          });
           grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
               
           grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
               
-		  if(!!f.plistoptions) {
-              opts = _.pick(f.plistoptions, keys);
-              _.each(opts, function(val, o) {
-                    grunt.config("plistbuddy."+o+".src", plist);
-                    grunt.config("plistbuddy."+o+".value", val);
-                    grunt.task.run("plistbuddy:"+o);
-              });
-		  }
 		} else {
 		  var file = f.root || f.component || f.scripts;
 		  if(!f.pkgname) {
 			  grunt.log.warn("Missing package name for "+file);
 			  return false;
 		  } 
-		  var pkgname = dest+f.pkgname;
+		  var pkgname = abs_path(f.pkgname, options.dest);
 		  if(!!f.component && f.component.length > 0){
               grunt.config("exec.createMacPkgFromComponent.cwd", options.cwd);
               grunt.config("exec.createMacPkgFromComponent.callback", done);
               grunt.task.run("exec:createMacPkgFromComponent:"+f.component+":"+pkgname+":"+f.location+":"+f.identifier);
 		  } else if(!!f.root && f.root.length > 0) {
-			  plist = f.plist;
-			  if(!!f.plistoptions) {
-				  opts = _.pick(f.plistoptions, keys);
-				  if(opts.length > 0) {
-					  if(!f.plist) {
-                          plist = dest + f.root + ".plist";
-                          grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
-                          grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
-					  }
-                      _.each(opts, function(val, o) {
-                             grunt.config("plistbuddy."+o+".value", val);
-                             grunt.task.run("plistbuddy:"+o);
-                      });
-                  }
-			  }
-            grunt.config("exec.createMacPkgFromRoot.callback", done);
+              callback = function() {
+                if(!fs.existsSync(plist)) {
+                    grunt.config("exec.analyzeMacPkg.callback", function() {
+                        set_plist(plist, done);
+                    });
+                    grunt.config("exec.analyzeMacPkg.cwd", options.cwd);
+                    grunt.task.run("exec:analyzeMacPkg:"+f.root+":"+plist+":"+f.scripts);
+                } else {
+                    set_plist(plist);
+                    done.call();
+                }
+			  };
+            grunt.config("exec.createMacPkgFromRoot.callback", callback);
             grunt.config("exec.createMacPkgFromRoot.cwd", options.cwd);
             grunt.task.run("exec:createMacPkgFromRoot:"+f.root+":"+pkgname+":"+f.version+":"+f.location+":"+f.identifier+":"+f.scripts+":"+plist);
 		  } else if(!!f.scripts && f.scripts.length > 0) {

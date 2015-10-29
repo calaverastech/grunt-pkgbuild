@@ -49,7 +49,7 @@ module.exports = function(grunt) {
             },
             files: [
                     {root: "fixtures/root", analyze: true, plist: "Info.plist", plistoptions: {"BundleIsRelocatable": false}},
-                    {root: "fixtures/root", plist: "packages/Info.plist", location: "/tmp", version: "1.0", identifier: "<%= receipts.root %>", pkgname: "<%= name_prefix %>-fromRoot-<%= date %>"},
+                    {root: "fixtures/root", plist: "Info.plist", location: "/tmp", version: "1.0", identifier: "<%= receipts.root %>", pkgname: "<%= name_prefix %>-fromRoot-<%= date %>"},
                     {root: "fixtures/root", location: "/tmp", version: "1.0", identifier: "<%= receipts.root2 %>", pkgname: "<%= name_prefix %>-fromRoot2-<%= date %>", plistoptions: {"BundleIsRelocatable": false}},
                     {component: ["fixtures/comp/<%= name_prefix %>Comp.app"], location: "/tmp", pkgname: "<%= name_prefix %>-fromComp-<%= date %>"},
                     {scripts: "fixtures/scripts/preflight", pkgname: "<%= name_prefix %>-preflight-<%= date %>", identifier: "<%= receipts.preflight %>"},
