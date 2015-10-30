@@ -31,6 +31,8 @@
   "dependencies": {
     "grunt-exec": "^0.4.6",
     "grunt-plistbuddy": "^0.1.x",
+    "step": "^0.0.6",
+    "async": "^1.5.x",
     "lodash": "^3.10.x",
     "grunt-xmlpoke": "^0.8.x",
     "grunt": "~0.4.5"
