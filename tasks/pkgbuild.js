@@ -251,13 +251,10 @@ module.exports = function(grunt) {
                           
 
     function create_pkg(f, callback) {
-                          console.log("pkg", f);
         var plist = abs_path((f.plist || (path.basename(f.root) + ".plist")), options.dest),
             pkgname = abs_path(f.pkgname, options.dest),
             opts = _.pick(f.plistoptions, keys),
             create_plist = !!f.analyze || (!!f.root && f.root.length > 0 && !fs.existsSync(plist));
-                          
-                          console.log("pkgname", pkgname);
         
         step(
             function analyze_func() {
