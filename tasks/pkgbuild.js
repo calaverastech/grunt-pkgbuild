@@ -264,16 +264,22 @@ module.exports = function(grunt) {
                 _.bind(set_plist, f, plist, opts)(this);
             },
             function create_pkg_func() {
+                var func = function() {
+                    callback(null, pkgname);
+                };
                 if(!!pkgname && pkgname.length > 0) {
                     if(!!f.component && f.component.length > 0) {
-                        _.bind(create_from_component, f, options.cwd, plist, pkgname)();
+                        _.bind(create_from_component, f, options.cwd, plist, pkgname)(func);
                     } else if(!!f.root && f.root.length > 0) {
-                        _.bind(create_from_root, f, options.cwd, plist, pkgname)();
+                        _.bind(create_from_root, f, options.cwd, plist, pkgname)(func);
                     } else if(!!f.scripts && f.scripts.length > 0) {
-                        _.bind(create_from_scripts, f, options.cwd, pkgname)();
+                        _.bind(create_from_scripts, f, options.cwd, pkgname)(func);
+                    } else {
+                        callback(null, pkgname);
                     }
+                } else {
+                    callback(null, pkgname);
                 }
-                callback(null, pkgname);
             }
         );
     }
