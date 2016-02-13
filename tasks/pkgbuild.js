@@ -41,18 +41,18 @@ module.exports = function(grunt) {
 	  	exec: {
             mkdir: {
                      cmd: function(dir) {
-                        return "mkdir -p " + dir;
+                        return 'mkdir -p "' + dir + '"';
                      }
             },
             createScriptPkg: {
                      cmd: function(scripts, pkgname, identifier) {
-                        return "pkgbuild --identifier " + ((!!identifier && identifier.length > 0) ? identifier : ("com." + pkgname + ".pkg")) + " --nopayload --scripts " + scripts + " " + pkgname + ".pkg";
+                        return "pkgbuild --identifier " + ((!!identifier && identifier.length > 0) ? identifier : ('"com.' + pkgname + '.pkg"')) + " --nopayload --scripts " + scripts + ' "'+ pkgname + '.pkg"';
                      },
                      stdout: true,
             },
             analyzeMacPkg: {
                      cmd: function (root, plist, scripts) {
-                        return "pkgbuild --analyze --root " + root + ((!!scripts && scripts.length > 0) ? (" --scripts " + scripts) : "") + " " + plist;
+                        return "pkgbuild --analyze --root " + root + ((!!scripts && scripts.length > 0) ? (' --scripts "' + scripts + '"') : "") + ' "' + plist + '"';
                      },
                      stdout: true
             },
@@ -70,7 +70,7 @@ module.exports = function(grunt) {
                             }
                             return comm + " --component " + comp + ((!!currentLoc && currentLoc.length > 0) ? (" --install-location " + currentLoc):"");
                         }, "");
-                        return "pkgbuild " + comp_str + ((!!identifier && identifier.length > 0) ? (" --identifier " + identifier) : "") + ((!!scripts && scripts.length > 0) ? (" --scripts " + scripts):"") +  " " + pkgname + ".pkg";
+                        return "pkgbuild " + comp_str + ((!!identifier && identifier.length > 0) ? (" --identifier " + identifier) : "") + ((!!scripts && scripts.length > 0) ? (" --scripts " + scripts):"") +  ' "' + pkgname + '.pkg"';
                      },
                      stdout: true
             },
@@ -78,11 +78,11 @@ module.exports = function(grunt) {
                      cmd: function(root, pkgname, version, loc, identifier, scripts, plist) {
                         return "pkgbuild --root " + root +
                         " --identifier " + ((!!identifier && identifier.length > 0) ? identifier : ("com." + pkgname+".pkg")) +
-                        ((!!plist && plist.length > 0) ? (" --component-plist " + plist) : "") +
+                        ((!!plist && plist.length > 0) ? (' --component-plist "' + plist + '"') : "") +
                         ((!!version && version.length > 0) ? (" --version " + version) : "") +
                         ((!!loc && loc.length > 0) ? (" --install-location " + loc) : "") +
                         ((!!scripts && scripts.length > 0) ? (" --scripts " + scripts) : "") +
-                        " " + pkgname + ".pkg";
+                        ' "' + pkgname + '.pkg"';
                      },
                      stdout: true,
             }
@@ -221,7 +221,7 @@ module.exports = function(grunt) {
         if(override) {
             grunt.config("exec.analyzeMacPkg.callback", callback);
             grunt.config("exec.analyzeMacPkg.cwd", cwd);
-            grunt.task.run("exec:analyzeMacPkg:"+this.root+":"+plist+":"+this.scripts);
+                          grunt.task.run('exec:analyzeMacPkg:'+this.root+':'+plist+':'+this.scripts);
         } else {
             callback.call();
         }
