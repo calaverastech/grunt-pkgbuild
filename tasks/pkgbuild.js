@@ -112,7 +112,7 @@ module.exports = function(grunt) {
   });
     
     
-    var libs = ['grunt-plistbuddy'];
+    var libs = ['grunt-plistbuddy', 'grunt-exec'];
     
     var apppath = process.cwd(),
     dirfiles = [],
